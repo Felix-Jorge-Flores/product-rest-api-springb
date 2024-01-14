@@ -1,9 +1,14 @@
 package com.bc.implementation;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.bc.exception.ProductException;
@@ -12,6 +17,7 @@ import com.bc.model.Product;
 import com.bc.repository.CategoryRepo;
 import com.bc.repository.ProductRepo;
 import com.bc.service.ProductService;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -30,7 +36,21 @@ public class ProductServiceImpl implements ProductService {
 			throw new ProductException("Products not found");
 		}
 	}
+	@Override
+	public Page<Product> getProducts(
+			@RequestParam Optional<Integer> page,
+			@RequestParam Optional<String> sortBy
+	) throws ProductException {
 
+		return pRepo.findAll(
+				PageRequest.of(
+
+				page.orElse(0),
+				20,
+				Sort.Direction.DESC, sortBy.orElse("id")
+				)
+		);
+	}
 	@Override
 	public Product addProduct(Product product) throws ProductException {
 		Product pro = pRepo.save(product);
@@ -82,5 +102,33 @@ public class ProductServiceImpl implements ProductService {
 		return p;
 
 	}
+
+	public List<Product> searchProductByQuery(String query) throws ProductException {
+		List<Product> result = new ArrayList<>();
+		List<Product> products = pRepo.findAll();
+		for (Product product : products) {
+			Field[] fields = Product.class.getDeclaredFields();
+
+			for (Field field : fields) {
+				if (field.getType() == String.class) {
+					field.setAccessible(true);
+
+					try {
+						String fieldValue = (String) field.get(product);
+
+						if (fieldValue != null && fieldValue.toLowerCase().contains(query.toLowerCase())) {
+							result.add(product);
+							break;  // No es necesario seguir revisando los otros campos
+						}
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+
 
 }

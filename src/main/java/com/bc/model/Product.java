@@ -1,12 +1,6 @@
 package com.bc.model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Embeddable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 import lombok.Data;
 
@@ -15,15 +9,25 @@ import lombok.Data;
 @Entity
 public class Product {
 
+	/*@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)*/
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "product_sequence")
+	@SequenceGenerator(name = "product_sequence", sequenceName = "product_sequence", initialValue = 81)
 	private Integer productId;
-	private String productName;
-	private Double price;
+	private String nombre;
+	private String marca;
+	private String modelo;
+	private Integer precio;
+	private Double garantia;
 	private String color;
-	private String dimension;
-	private String specification;
-	private String menufacturer;
+	private String voltaje;
+	private Double alto;
+	private Double ancho;
+	private Double profundidad;
+	private String eficienciaEnergetica;
+	private Double peso;
+	private String imageUrl;
 
 	@ManyToOne(cascade = CascadeType.ALL)
 	private Category category;

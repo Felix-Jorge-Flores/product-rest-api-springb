@@ -56,7 +56,9 @@ public class LoginServiceImpl implements LoginService {
 				currentUserSession.setPrivateKey(privateKey);
 
 				sessionRepo.save(currentUserSession);
+				/*return "Login Sucessufull!";*/
 				return "Login Sucessufull!";
+
 			} else {
 				throw new LoginException("Please Enter a valid password");
 			}
